@@ -2,380 +2,60 @@
   "schemaVersion": 1,
   "id": "github-projects-mcp",
   "kind": "provider-connector",
-  "artifactType": "connector",
-  "qualityVersion": 2,
+  "product": "pipmcp",
   "title": "GitHub Projects MCP server",
-  "description": "Summarize project work then link an approved existing issue or pull request. Read provider data first, then explicitly approve the selected change with operator write opt-in and a unique per-call approval key.",
+  "description": "Use GitHub Projects with AI agents through one PipMCP API key, actual hosted schemas and governed execution.",
   "status": "ready",
   "verification": "mock-only",
   "releaseEligible": true,
+  "operationIds": [],
   "maintainer": "jannikco",
   "license": "MIT",
-  "product": "pipmcp",
-  "appSlug": "github-projects",
-  "appName": "GitHub Projects",
-  "operationIds": [
-    "list_organization_projects",
-    "list_project_items",
-    "add_project_item"
-  ],
-  "sourceRevision": "e6d1d566370e6513b8838c68abf8e6fb79172d0606481c7f3d4431cba876e04f",
+  "attributionSlug": "github-github-projects-mcp",
+  "sourceRevision": "375868a4e483c900e5dfc979fa10432a7213ee4276f2eca196b1e7fe7a5e6b8c",
+  "qualityVersion": 2,
+  "artifactType": "connector",
   "evidence": [
-    "Actual tools/call and direct-provider request contract tests"
+    "Gateway HTTP transport fixtures",
+    "Generated stdio wrapper discovery/call fixtures"
   ],
   "provenance": [
     "https://docs.github.com/en/graphql/overview/public-schema",
     "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects"
   ],
-  "attributionSlug": "github-github-projects-mcp",
-  "connectorId": "github-projects",
-  "connector": {
-    "id": "github-projects",
-    "appSlug": "github-projects",
-    "name": "GitHub Projects",
-    "version": "0.2.0",
-    "baseUrl": "https://api.github.com",
-    "auth": {
-      "type": "bearer",
-      "env": "GITHUB_TOKEN"
-    },
-    "tools": [
-      {
-        "name": "list_organization_projects",
-        "description": "List organization projects.",
-        "method": "POST",
-        "path": "/graphql",
-        "readOnly": true,
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "organization": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            },
-            "first": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
-            },
-            "after": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            }
-          },
-          "required": [
-            "organization",
-            "first"
-          ],
-          "additionalProperties": false
-        },
-        "bindings": {
-          "path": [],
-          "query": {},
-          "body": {
-            "organization": "variables.organization",
-            "first": "variables.first",
-            "after": "variables.after"
-          }
-        },
-        "sampleArguments": {
-          "organization": "organization",
-          "first": 10
-        },
-        "body": {
-          "query": "query Projects($organization: String!, $first: Int!, $after: String) { organization(login: $organization) { projectsV2(first: $first, after: $after) { nodes { id title number url closed } pageInfo { hasNextPage endCursor } } } }"
-        },
-        "pagination": {
-          "type": "cursor",
-          "cursorInput": "after",
-          "nextCursorPath": "data.organization.projectsV2.pageInfo.endCursor",
-          "hasMorePath": "data.organization.projectsV2.pageInfo.hasNextPage"
-        },
-        "provenance": [
-          "https://docs.github.com/en/graphql/overview/public-schema",
-          "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects"
-        ],
-        "approvalRequired": false,
-        "evidence": {
-          "providerLiveValidation": "not-run",
-          "localValidation": "provider-request-fixture"
-        }
-      },
-      {
-        "name": "list_project_items",
-        "description": "List project items.",
-        "method": "POST",
-        "path": "/graphql",
-        "readOnly": true,
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "projectId": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            },
-            "first": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
-            },
-            "after": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            }
-          },
-          "required": [
-            "projectId",
-            "first"
-          ],
-          "additionalProperties": false
-        },
-        "bindings": {
-          "path": [],
-          "query": {},
-          "body": {
-            "projectId": "variables.projectId",
-            "first": "variables.first",
-            "after": "variables.after"
-          }
-        },
-        "sampleArguments": {
-          "projectId": "PVT_example",
-          "first": 10
-        },
-        "body": {
-          "query": "query Items($projectId: ID!, $first: Int!, $after: String) { node(id: $projectId) { ... on ProjectV2 { title items(first: $first, after: $after) { nodes { id type content { ... on Issue { title url } ... on PullRequest { title url } ... on DraftIssue { title } } } pageInfo { hasNextPage endCursor } } } } }"
-        },
-        "pagination": {
-          "type": "cursor",
-          "cursorInput": "after",
-          "nextCursorPath": "data.node.items.pageInfo.endCursor",
-          "hasMorePath": "data.node.items.pageInfo.hasNextPage"
-        },
-        "provenance": [
-          "https://docs.github.com/en/graphql/overview/public-schema",
-          "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects"
-        ],
-        "approvalRequired": false,
-        "evidence": {
-          "providerLiveValidation": "not-run",
-          "localValidation": "provider-request-fixture"
-        }
-      },
-      {
-        "name": "add_project_item",
-        "description": "Add project item.",
-        "method": "POST",
-        "path": "/graphql",
-        "readOnly": false,
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "projectId": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            },
-            "contentId": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 2048,
-              "description": "Value"
-            }
-          },
-          "required": [
-            "projectId",
-            "contentId"
-          ],
-          "additionalProperties": false
-        },
-        "bindings": {
-          "path": [],
-          "query": {},
-          "body": {
-            "projectId": "variables.projectId",
-            "contentId": "variables.contentId"
-          }
-        },
-        "sampleArguments": {
-          "projectId": "PVT_example",
-          "contentId": "I_example"
-        },
-        "body": {
-          "query": "mutation Add($projectId: ID!, $contentId: ID!) { addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) { item { id } } }"
-        },
-        "provenance": [
-          "https://docs.github.com/en/graphql/overview/public-schema",
-          "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects"
-        ],
-        "approvalRequired": true,
-        "evidence": {
-          "providerLiveValidation": "not-run",
-          "localValidation": "provider-request-fixture"
-        }
-      }
-    ],
-    "workflow": {
-      "name": "Summarize project work then link an approved existing issue or pull request",
-      "description": "Summarize project work then link an approved existing issue or pull request. Read provider data first, then explicitly approve the selected change with operator write opt-in and a unique per-call approval key.",
-      "steps": [
-        "list_organization_projects",
-        "list_project_items",
-        "add_project_item"
-      ]
-    },
-    "provenance": [
-      "https://docs.github.com/en/graphql/overview/public-schema",
-      "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects"
-    ],
-    "verification": "mock-only",
-    "providerLiveValidation": "not-run",
-    "capabilityEvidence": {
-      "local": {
-        "level": "Tested",
-        "operations": [
-          {
-            "name": "list_organization_projects",
-            "level": "Tested",
-            "evidenceRefs": [
-              "Provider request/stdio contract tests"
-            ],
-            "method": "contract-fixture"
-          },
-          {
-            "name": "list_project_items",
-            "level": "Tested",
-            "evidenceRefs": [
-              "Provider request/stdio contract tests"
-            ],
-            "method": "contract-fixture"
-          },
-          {
-            "name": "add_project_item",
-            "level": "Tested",
-            "evidenceRefs": [
-              "Provider request/stdio contract tests"
-            ],
-            "method": "contract-fixture"
-          }
-        ],
-        "evidenceRefs": [
-          "Provider request/stdio contract tests"
-        ],
-        "mode": "local"
-      },
-      "managed": {
-        "level": "Documented",
-        "operations": [
-          {
-            "name": "list_organization_projects",
-            "level": "Documented",
-            "evidenceRefs": [],
-            "method": "documentation"
-          },
-          {
-            "name": "list_project_items",
-            "level": "Documented",
-            "evidenceRefs": [],
-            "method": "documentation"
-          },
-          {
-            "name": "add_project_item",
-            "level": "Documented",
-            "evidenceRefs": [],
-            "method": "documentation"
-          }
-        ],
-        "evidenceRefs": [],
-        "mode": "managed"
-      }
-    },
-    "headers": {
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "PipMCP-GitHub-Projects-Connector"
-    },
-    "repoId": "github-projects-mcp",
-    "product": "pipmcp",
-    "artifactType": "connector",
-    "sourceRevision": "e6d1d566370e6513b8838c68abf8e6fb79172d0606481c7f3d4431cba876e04f",
-    "managedAvailability": {
-      "status": "import-required",
-      "integration": "graphql-to-mcp",
-      "checkedAt": "2026-11-08T13:20:45.156456+00:00"
-    }
+  "utility": {
+    "problem": "Summarize project work then link an approved existing issue or pull request. Read provider data first, then explicitly approve the selected change with operator write opt-in and a unique per-call approval key.",
+    "output": "Actual hosted tool schemas and durable governed execution receipts"
   },
+  "appSlug": "github-projects",
+  "appName": "GitHub Projects",
+  "connectorId": "github-projects",
+  "executionAuthority": "pipmcp-gateway",
+  "version": "1.0.0",
+  "agentReady": true,
   "capabilityEvidence": {
     "local": {
       "level": "Tested",
       "operations": [
         {
-          "name": "list_organization_projects",
+          "name": "gateway_transport",
           "level": "Tested",
+          "method": "contract-fixture",
           "evidenceRefs": [
-            "Provider request/stdio contract tests"
-          ],
-          "method": "contract-fixture"
-        },
-        {
-          "name": "list_project_items",
-          "level": "Tested",
-          "evidenceRefs": [
-            "Provider request/stdio contract tests"
-          ],
-          "method": "contract-fixture"
-        },
-        {
-          "name": "add_project_item",
-          "level": "Tested",
-          "evidenceRefs": [
-            "Provider request/stdio contract tests"
-          ],
-          "method": "contract-fixture"
+            "Generated gateway/stdio fixtures"
+          ]
         }
       ],
       "evidenceRefs": [
-        "Provider request/stdio contract tests"
+        "Generated gateway/stdio fixtures"
       ],
       "mode": "local"
     },
     "managed": {
       "level": "Documented",
-      "operations": [
-        {
-          "name": "list_organization_projects",
-          "level": "Documented",
-          "evidenceRefs": [],
-          "method": "documentation"
-        },
-        {
-          "name": "list_project_items",
-          "level": "Documented",
-          "evidenceRefs": [],
-          "method": "documentation"
-        },
-        {
-          "name": "add_project_item",
-          "level": "Documented",
-          "evidenceRefs": [],
-          "method": "documentation"
-        }
-      ],
+      "operations": [],
       "evidenceRefs": [],
       "mode": "managed"
     }
-  },
-  "utility": {
-    "problem": "Summarize project work then link an approved existing issue or pull request. Read provider data first, then explicitly approve the selected change with operator write opt-in and a unique per-call approval key.",
-    "output": "Actual provider API results through local MCP tools"
-  },
-  "providerDocs": "https://docs.github.com/en/graphql/overview/public-schema"
+  }
 }
